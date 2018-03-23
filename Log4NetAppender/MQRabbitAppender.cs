@@ -70,7 +70,7 @@ namespace Log4NetAppender
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
-                channel.ExchangeDeclare(exchange: "topic_logs",
+                channel.ExchangeDeclare(exchange: Exchange,
                     type: "topic");
                 var message = logs[0].RenderedMessage;
                 var body = Encoding.UTF8.GetBytes(message);

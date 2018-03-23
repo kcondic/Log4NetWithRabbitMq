@@ -16,12 +16,15 @@ namespace AppenderConsumer
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
-                channel.ExchangeDeclare(exchange: "consumer_exchange", type: "topic");
-                var queueName = channel.QueueDeclare().QueueName;
+                channel.ExchangeDeclare(exchange: "test", type: "topic");
+                //var queueName = channel.QueueDeclare().QueueName;
 
-                channel.QueueBind(queue: queueName,
-                    exchange: "consumer_exchange",
-                    routingKey: "consumer.exception");
+                //channel.QueueBind(queue: queueName,
+                //    exchange: "test",
+                //    routingKey: "*.test"); If i want only fresh messages I declare a randomly named queue
+
+                //direct route gets all messages in queue
+                channel.QueueBind(queue: "consumer", exchange: "test", routingKey: "*.test"); 
 
                 Console.WriteLine(" [*] Waiting for messages. To exit press CTRL+C");
 
@@ -35,7 +38,7 @@ namespace AppenderConsumer
                         routingKey,
                         message);
                 };
-                channel.BasicConsume(queue: queueName,
+                channel.BasicConsume(queue: "consumer",
                     autoAck: true,
                     consumer: consumer);
 

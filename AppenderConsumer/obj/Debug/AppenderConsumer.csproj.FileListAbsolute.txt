@@ -1,0 +1,12 @@
+C:\Users\kcondic\source\repos\Log4NetAppender\AppenderConsumer\obj\Debug\AppenderConsumer.csprojResolveAssemblyReference.cache
+C:\Users\kcondic\source\repos\Log4NetAppender\AppenderConsumer\obj\Debug\AppenderConsumer.csproj.CoreCompileInputs.cache
+C:\Users\kcondic\source\repos\Log4NetAppender\AppenderConsumer\bin\Debug\AppenderConsumer.exe.config
+C:\Users\kcondic\source\repos\Log4NetAppender\AppenderConsumer\bin\Debug\AppenderConsumer.exe
+C:\Users\kcondic\source\repos\Log4NetAppender\AppenderConsumer\bin\Debug\AppenderConsumer.pdb
+C:\Users\kcondic\source\repos\Log4NetAppender\AppenderConsumer\bin\Debug\Microsoft.Diagnostics.Tracing.EventSource.dll
+C:\Users\kcondic\source\repos\Log4NetAppender\AppenderConsumer\bin\Debug\RabbitMQ.Client.dll
+C:\Users\kcondic\source\repos\Log4NetAppender\AppenderConsumer\bin\Debug\Microsoft.Diagnostics.Tracing.EventSource.xml
+C:\Users\kcondic\source\repos\Log4NetAppender\AppenderConsumer\bin\Debug\RabbitMQ.Client.xml
+C:\Users\kcondic\source\repos\Log4NetAppender\AppenderConsumer\obj\Debug\AppenderConsumer.csproj.CopyComplete
+C:\Users\kcondic\source\repos\Log4NetAppender\AppenderConsumer\obj\Debug\AppenderConsumer.exe
+C:\Users\kcondic\source\repos\Log4NetAppender\AppenderConsumer\obj\Debug\AppenderConsumer.pdb

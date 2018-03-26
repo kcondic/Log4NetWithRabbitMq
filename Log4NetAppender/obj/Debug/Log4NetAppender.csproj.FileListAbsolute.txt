@@ -14,3 +14,18 @@ C:\Users\kcondic\source\repos\Log4NetAppender\Log4NetAppender\obj\Debug\Log4NetA
 C:\Users\kcondic\source\repos\Log4NetAppender\Log4NetAppender\obj\Debug\Log4NetAppender.csproj.CopyComplete
 C:\Users\kcondic\source\repos\Log4NetAppender\Log4NetAppender\obj\Debug\Log4NetAppender.exe
 C:\Users\kcondic\source\repos\Log4NetAppender\Log4NetAppender\obj\Debug\Log4NetAppender.pdb
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\bin\Debug\Log4NetAppender.exe.config
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\bin\Debug\Log4NetAppender.exe
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\bin\Debug\Log4NetAppender.pdb
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\bin\Debug\ExceptionTransformer.dll
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\bin\Debug\log4net.dll
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\bin\Debug\RabbitMQ.Client.dll
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\bin\Debug\ExceptionTransformer.pdb
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\bin\Debug\log4net.xml
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\bin\Debug\RabbitMQ.Client.xml
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\obj\Debug\Log4NetAppender.csprojResolveAssemblyReference.cache
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\obj\Debug\Log4NetAppender.csproj.CoreCompileInputs.cache
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\obj\Debug\Log4NetAppender.exe
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\Log4NetAppender\obj\Debug\Log4NetAppender.pdb

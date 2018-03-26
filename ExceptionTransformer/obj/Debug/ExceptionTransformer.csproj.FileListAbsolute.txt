@@ -4,3 +4,9 @@ C:\Users\kcondic\source\repos\Log4NetAppender\ExceptionTransformer\obj\Debug\Exc
 C:\Users\kcondic\source\repos\Log4NetAppender\ExceptionTransformer\obj\Debug\ExceptionTransformer.csproj.CoreCompileInputs.cache
 C:\Users\kcondic\source\repos\Log4NetAppender\ExceptionTransformer\obj\Debug\ExceptionTransformer.dll
 C:\Users\kcondic\source\repos\Log4NetAppender\ExceptionTransformer\obj\Debug\ExceptionTransformer.pdb
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\ExceptionTransformer\bin\Debug\ExceptionTransformer.dll
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\ExceptionTransformer\bin\Debug\ExceptionTransformer.pdb
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\ExceptionTransformer\obj\Debug\ExceptionTransformer.csprojResolveAssemblyReference.cache
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\ExceptionTransformer\obj\Debug\ExceptionTransformer.csproj.CoreCompileInputs.cache
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\ExceptionTransformer\obj\Debug\ExceptionTransformer.dll
+C:\Users\Kreso\Desktop\Nova mapa\Log4NetWithRabbitMq\ExceptionTransformer\obj\Debug\ExceptionTransformer.pdb

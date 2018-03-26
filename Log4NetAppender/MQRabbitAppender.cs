@@ -70,8 +70,7 @@ namespace Log4NetAppender
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
-                channel.ExchangeDeclare(exchange: Exchange,
-                    type: "topic");
+                channel.ExchangeDeclare(exchange: Exchange, type: "topic");
                 var message = logs[0].RenderedMessage;
                 var body = Encoding.UTF8.GetBytes(message);
                 channel.BasicPublish(exchange: Exchange,
@@ -79,34 +78,6 @@ namespace Log4NetAppender
                     basicProperties: null,
                     body: body);
                 Console.WriteLine(" [x] Sent '{0}':'{1}'", RoutingKey, message);
-
-                //ogolit sve šta ima viška 
-
-                //Stopwatch stopwatch = Stopwatch.StartNew();
-                //try
-                //{
-                //    LogLog.Debug(typeof(MqRabbitAppender), "publishing " + (object)logs.Length + " logs");
-                //    byte[] body = this._messageBuilder.Build(logs);
-                //    using (IConnection connection = this._connectionFactory.CreateConnection())
-                //    {
-                //        using (IModel model = connection.CreateModel())
-                //        {
-                //            IBasicProperties basicProperties = model.CreateBasicProperties();
-                //            basicProperties.ContentEncoding = this._messageBuilder.ContentEncoding;
-                //            basicProperties.ContentType = this._messageBuilder.ContentType;
-                //         //   basicProperties.DeliveryMode = (byte)2;
-                //            model.BasicPublish(this.Exchange, this.RoutingKey, null, body);
-                //        }
-                //    }
-                //}
-                //catch (Exception ex)
-                //{
-                //    LogLog.Debug(typeof(MqRabbitAppender), "Exception comunicating with rabbitmq", ex);
-                //}
-                //finally
-                //{
-                //    LogLog.Debug(typeof(MqRabbitAppender), "process completed, took " + (object)stopwatch.Elapsed);
-                //}
             }
         }
     }

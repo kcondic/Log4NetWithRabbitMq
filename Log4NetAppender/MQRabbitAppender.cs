@@ -79,6 +79,9 @@ namespace Log4NetAppender
                     basicProperties: null,
                     body: body);
                 Console.WriteLine(" [x] Sent '{0}':'{1}'", RoutingKey, message);
+
+                //ogolit sve šta ima viška 
+
                 //Stopwatch stopwatch = Stopwatch.StartNew();
                 //try
                 //{

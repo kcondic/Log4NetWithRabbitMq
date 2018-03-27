@@ -11,7 +11,7 @@ namespace Log4NetAppender
     {
         static void Main(string[] args)
         {
-            System.AppDomain.CurrentDomain.FirstChanceException += new ExceptionLogger().UnhandledExceptionTrapper;
+            System.AppDomain.CurrentDomain.FirstChanceException += ExceptionLogger.ExceptionTrapper;
 
             try
             {

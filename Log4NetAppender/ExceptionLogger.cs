@@ -19,7 +19,7 @@ namespace Log4NetAppender
             log4net.Config.BasicConfigurator.Configure();
             Logger = LogManager.GetLogger(typeof(Program));
         }
-        private ILog Logger { get; }
+        private static ILog Logger { get; set; }
         // iz hgsport kako su napravili http logging
         //private ILog Logger { get; set; }
 
@@ -46,11 +46,14 @@ namespace Log4NetAppender
         //    Logger.Error(Environment.NewLine + context.Request.ToString().Replace("System.Web.Http.WebHost.HttpControllerHandler+LazyStreamContent", requestBody ?? "N/A"), context.Exception);
         //}
 
-        public void UnhandledExceptionTrapper(object sender, FirstChanceExceptionEventArgs e)
+        public static void ExceptionTrapper(object sender, FirstChanceExceptionEventArgs e)
         {
+            //kako izdvojit u nuget
+            //kako formirat routing key (od čega)
+            //ovdi obavit mapiranje
+            //ovdi? obavit razine logova u log4netu
             //var transformedException = new ExceptionTransformer.ExceptionTransformer(ex);
             Logger.Error(JsonConvert.SerializeObject(e.Exception));
         }
-        //pogledat kako spriječit pucanje uslijed exceptiona
     }
 }

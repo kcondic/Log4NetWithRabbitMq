@@ -11,19 +11,18 @@ namespace Log4NetAppender
     {
         static void Main(string[] args)
         {
-            log4net.Util.LogLog.InternalDebugging = true;
-            log4net.Config.BasicConfigurator.Configure();
-            log4net.ILog log = log4net.LogManager.GetLogger(typeof(Program));
+            System.AppDomain.CurrentDomain.FirstChanceException += new ExceptionLogger().UnhandledExceptionTrapper;
+
             try
             {
                 string str = String.Empty;
-                string subStr = str.Substring(0, 4); //this line will create error as the string "str" is empty.  
+                string subStr = str.Substring(0, 4); //this line will create error as the string "str" is empty. 
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                //var transformedException = new ExceptionTransformer.ExceptionTransformer(ex);
-                log.Error(JsonConvert.SerializeObject(ex));
+                Console.WriteLine("catch blok");
             }
+            
 
             Console.ReadLine();
         }

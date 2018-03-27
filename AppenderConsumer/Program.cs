@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,39 +11,48 @@ namespace AppenderConsumer
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            //prebacit sve u generalni slučaj
-            var factory = new ConnectionFactory() { HostName = "localhost" };
+            var factory = new ConnectionFactory() {
+                                                    HostName = "localhost",
+                                                    UserName = "guest",
+                                                    Password = "testtest"
+                                                  };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
-                channel.ExchangeDeclare(exchange: "test", type: "topic");
+                channel.ExchangeDeclare(exchange: "HattrickExchange", type: "topic");
+                var queueName = "test";
+                var willDeleteAfterConnection = false;
+                var routingKeys = new List<string>
+                {
+                    "consumer.test",
+                    "test.test"
+                };
                 //omogućit korisniku biranje imena queuea i oće li se brisat nakon gašenja veze
-                channel.QueueDeclare("test", true, false, false, new Dictionary<string, object>
+                channel.QueueDeclare(queueName, true, willDeleteAfterConnection, false, new Dictionary<string, object>
                 {
                     { "x-queue-mode", "lazy" }
                 });
-                channel.QueueBind(queue: "test", exchange: "test", routingKey: "*.test");
-                // ovdi sva bindanja koja ti tribaju
-                Console.WriteLine(" [*] Waiting for messages. To exit press CTRL+C");
+
+                foreach (var routingKey in routingKeys)
+                    channel.QueueBind(queueName, "HattrickExchange", routingKey);
+
+                Console.WriteLine("Čekam poruke...");
 
                 var consumer = new EventingBasicConsumer(channel);
                 consumer.Received += (model, ea) =>
                 {
                     var body = ea.Body;
                     var message = Encoding.UTF8.GetString(body);
-                    var routingKey = ea.RoutingKey;
-                    Console.WriteLine(" [x] Received '{0}':'{1}'",
-                        routingKey,
-                        message);
+                    var msgRoutingKey = ea.RoutingKey;
+                    Console.WriteLine(" Primljena ruta: '{0}' \nPoruka: '{1}'", msgRoutingKey, message);
                 };
-                channel.BasicConsume(queue: "test",
-                    autoAck: true,
-                    consumer: consumer);
-
+                channel.BasicConsume(queueName, true, consumer);
                 Console.WriteLine(" Press [enter] to exit.");
                 Console.ReadLine();
+
+                //istraži razliku topic i header exchangea
             }
         }
     }

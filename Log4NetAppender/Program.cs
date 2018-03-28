@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,18 +14,23 @@ namespace Log4NetAppender
         {
             System.AppDomain.CurrentDomain.FirstChanceException += ExceptionLogger.ExceptionTrapper;
 
+            ThrowException();
+            ThrowException();
+            ThrowException();
+            
+            Console.ReadLine();
+        }
+
+        static void ThrowException()
+        {
             try
             {
-                string str = String.Empty;
-                string subStr = str.Substring(0, 4); //this line will create error as the string "str" is empty. 
+                throw new InvalidOperationException("ovo je vanjski", new InvalidOperationException("ovo je unutarnji", new InvalidOperationException("ovo je drugi unutarnji")));
             }
             catch (Exception e)
             {
                 Console.WriteLine("catch blok");
             }
-            
-
-            Console.ReadLine();
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using log4net;
@@ -13,47 +14,45 @@ namespace Log4NetAppender
 {
     public class ExceptionLogger
     {
-        public ExceptionLogger()
+        static ExceptionLogger()
         {
-            log4net.Util.LogLog.InternalDebugging = true;
+            //log4net.Util.LogLog.InternalDebugging = true;
             log4net.Config.BasicConfigurator.Configure();
             Logger = LogManager.GetLogger(typeof(Program));
+            LastException = null;
         }
-        private static ILog Logger { get; set; }
-        // iz hgsport kako su napravili http logging
-        //private ILog Logger { get; set; }
-
-        //public ExceptionLogger()
-        //{
-        //    Logger = log4net.LogManager.GetLogger("Unhandled"); prominit u ime appendera
-
-        //}
-
-        //public override async void Log(System.Web.Http.ExceptionHandling.ExceptionLoggerContext context)
-        //{
-        //    base.Log(context);
-
-        //    string requestBody = null;
-        //    if (HttpContext.Current != null)
-        //    {
-        //        using (var reader = new StreamReader(HttpContext.Current.Request.InputStream))
-        //        {
-        //            reader.BaseStream.Seek(0, SeekOrigin.Begin);
-        //            requestBody = reader.ReadToEnd();
-        //        }
-        //    }
-
-        //    Logger.Error(Environment.NewLine + context.Request.ToString().Replace("System.Web.Http.WebHost.HttpControllerHandler+LazyStreamContent", requestBody ?? "N/A"), context.Exception);
-        //}
+        private static ILog Logger { get; }
+        private static Exception LastException { get; set; }
 
         public static void ExceptionTrapper(object sender, FirstChanceExceptionEventArgs e)
         {
             //kako izdvojit u nuget
-            //kako formirat routing key (od čega)
-            //ovdi obavit mapiranje
-            //ovdi? obavit razine logova u log4netu
-            //var transformedException = new ExceptionTransformer.ExceptionTransformer(ex);
-            Logger.Error(JsonConvert.SerializeObject(e.Exception));
+            //routing key -> appname, loglevel
+            //razine settat u configu i odredit koliko detalja daje koja razina
+            var currentException = e.Exception;
+
+            if (LastException != null //usporedi je li to isti exception
+                )
+                return;
+            Console.WriteLine("Ovo je trenutni: " + currentException);
+            Console.WriteLine("Ovo je zadnji: " + LastException);
+            LastException = currentException;
+
+            var exceptionWithInner = new List<ExceptionTransformer.ExceptionTransformer>
+            {
+                new ExceptionTransformer.ExceptionTransformer(currentException)
+            };
+
+            while (currentException.InnerException != null)
+            {
+                exceptionWithInner.Add(new ExceptionTransformer.ExceptionTransformer(currentException.InnerException));
+                currentException = currentException.InnerException;
+            }
+
+            for (var i = 0; i < exceptionWithInner.Count - 1; ++i)
+                exceptionWithInner[i].InnerException = exceptionWithInner[i + 1];
+
+            Logger.Error(JsonConvert.SerializeObject(exceptionWithInner[0]));
         }
     }
 }

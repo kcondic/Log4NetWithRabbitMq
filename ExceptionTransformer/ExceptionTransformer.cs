@@ -12,13 +12,13 @@ namespace ExceptionTransformer
         {
             Message = exceptionToTransform.Message;
             StackTrace = exceptionToTransform.StackTrace;
-            InnerException = exceptionToTransform.InnerException;
+            InnerException = null;
             TimeOfException = DateTime.UtcNow;
         }
 
         public string Message { get; }
         public string StackTrace { get; }
-        public Exception InnerException { get; }
+        public ExceptionTransformer InnerException { get; set; }
         public DateTime TimeOfException { get; }
     }
 }

@@ -61,7 +61,7 @@ namespace Log4NetAppender
 
         public void Process(LoggingEvent[] logs)
         {
-            var factory = new ConnectionFactory() {HostName = "localhost", UserName = UserName, Password = Password };
+            var factory = new ConnectionFactory() {HostName = HostName, UserName = UserName, Password = Password };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {

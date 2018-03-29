@@ -16,28 +16,15 @@ namespace Log4NetAppender
     {
         static ExceptionLogger()
         {
-            //log4net.Util.LogLog.InternalDebugging = true;
+            log4net.Util.LogLog.InternalDebugging = true;
             log4net.Config.BasicConfigurator.Configure();
             Logger = LogManager.GetLogger(typeof(Program));
-            LastException = null;
         }
         private static ILog Logger { get; }
-        private static Exception LastException { get; set; }
 
         public static void ExceptionTrapper(object sender, FirstChanceExceptionEventArgs e)
         {
-            //kako izdvojit u nuget
-            //routing key -> appname, loglevel
-            //razine settat u configu i odredit koliko detalja daje koja razina
             var currentException = e.Exception;
-
-            if (LastException != null //usporedi je li to isti exception
-                )
-                return;
-            Console.WriteLine("Ovo je trenutni: " + currentException);
-            Console.WriteLine("Ovo je zadnji: " + LastException);
-            LastException = currentException;
-
             var exceptionWithInner = new List<ExceptionTransformer.ExceptionTransformer>
             {
                 new ExceptionTransformer.ExceptionTransformer(currentException)

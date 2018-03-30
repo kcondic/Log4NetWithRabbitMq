@@ -52,12 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExceptionLogger.cs" />
     <Compile Include="Appender\RabbitMqAppender.cs" />
-    <Compile Include="ExceptionTransformer.cs" />
+    <Compile Include="ExceptionStructure\TransformException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Appender\WorkerThread.cs" />
+    <Compile Include="ExceptionStructure\QueueException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

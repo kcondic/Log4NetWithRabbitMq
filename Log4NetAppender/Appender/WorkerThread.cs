@@ -6,12 +6,6 @@ namespace Log4NetAppender
 {
     public class WorkerThread<T> : IDisposable
     {
-        private readonly ConcurrentQueue<T> _queue;
-        private readonly AutoResetEvent _disposeEvent;
-        private readonly Thread _thread;
-        private readonly TimeSpan _interval;
-        private readonly Action<T[]> _processor;
-
         public WorkerThread(string name, TimeSpan interval, Action<T[]> processor)
         {
             _interval = interval;
@@ -21,6 +15,12 @@ namespace Log4NetAppender
             _thread = new Thread(Loop) { Name = name, IsBackground = true };
             _thread.Start();
         }
+
+        private readonly ConcurrentQueue<T> _queue;
+        private readonly AutoResetEvent _disposeEvent;
+        private readonly Thread _thread;
+        private readonly TimeSpan _interval;
+        private readonly Action<T[]> _processor;
 
         public void Enqueue(T item)
         {

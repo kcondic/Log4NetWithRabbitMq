@@ -1,24 +1,22 @@
 ﻿using System;
 
-namespace Log4NetAppender
+namespace Log4NetAppender.ExceptionStructure
 {
-    public class ExceptionTransformer
+    public class TransformException
     {
-        public ExceptionTransformer(Exception exceptionToTransform, Guid exceptionGuid, int exceptionOrder)
+        public TransformException(Exception exceptionToTransform, Guid exceptionGuid, int exceptionOrder)
         {
             ExceptionId = exceptionGuid;
             Message = exceptionToTransform.Message;
             StackTrace = exceptionToTransform.StackTrace;
             InnerException = null;
-            TimeOfException = DateTime.UtcNow;
             Order = exceptionOrder;
         }
 
         public Guid ExceptionId { get; }
         public string Message { get; }
         public string StackTrace { get; }
-        public ExceptionTransformer InnerException { get; set; }
-        public DateTime TimeOfException { get; }
+        public TransformException InnerException { get; set; }
         public int Order { get; }
     }
 }

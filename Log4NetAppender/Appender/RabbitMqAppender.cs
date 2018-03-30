@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using log4net.Appender;
 using log4net.Core;
+using Log4NetAppender.ExceptionStructure;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 
@@ -12,11 +13,6 @@ namespace Log4NetAppender.Appender
 {
     public class RabbitMqAppender : AppenderSkeleton
     {
-        private ConnectionFactory _connectionFactory;
-        private WorkerThread<LoggingEvent> _worker;
-        private static readonly FieldInfo LoggingEventDataFieldInfo = 
-            typeof(LoggingEvent).GetField("m_data", BindingFlags.Instance | BindingFlags.NonPublic);
-        private string _routingKey;
         public RabbitMqAppender()
         {
             HostName = "localhost";
@@ -29,7 +25,15 @@ namespace Log4NetAppender.Appender
             Tennent = "";
             Environment = "";
             AppName = "";
+            DepthOfLog = 0;
         }
+
+        private ConnectionFactory _connectionFactory;
+        private WorkerThread<LoggingEvent> _worker;
+        private static readonly FieldInfo LoggingEventDataFieldInfo =
+            typeof(LoggingEvent).GetField("m_data", BindingFlags.Instance | BindingFlags.NonPublic);
+        private string _routingKey;
+
         public string HostName { get; set; }
         public string VirtualHost { get; set; }
         public string UserName { get; set; }
@@ -40,6 +44,7 @@ namespace Log4NetAppender.Appender
         public string Tennent { get; set; }
         public string Environment { get; set; }
         public string AppName { get; set; }
+        public int DepthOfLog { get; set; }
 
         protected override void OnClose()
         {
@@ -52,27 +57,27 @@ namespace Log4NetAppender.Appender
             var currentException = (Exception)loggingEvent.MessageObject;
             var exceptionGuid = Guid.NewGuid();
 
-            var exceptionWithInner = new List<ExceptionTransformer>
+            var exceptionWithInner = new List<TransformException>
             {
-                new ExceptionTransformer(currentException, exceptionGuid, 0)
+                new TransformException(currentException, exceptionGuid, 0)
             };
 
-            int.TryParse(ConfigurationManager.AppSettings["DepthOfLog"], out var depthOfLog);
-
-            for (var i = 0; i < depthOfLog; i++)
+            for (var i = 0; i < DepthOfLog; i++)
             {
                 if (currentException.InnerException == null)
                     break;
 
-                exceptionWithInner.Add(new ExceptionTransformer(currentException.InnerException, exceptionGuid, i + 1));
+                exceptionWithInner.Add(new TransformException(currentException.InnerException, exceptionGuid, i + 1));
                 currentException = currentException.InnerException;
             }
 
             for (var i = 0; i < exceptionWithInner.Count - 1; ++i)
                 exceptionWithInner[i].InnerException = exceptionWithInner[i + 1];
 
+            var queueException = new QueueException(Tennent, Environment, AppName, loggingEvent.Level.DisplayName, exceptionWithInner[0]);
+
             var loggingEventData = (LoggingEventData)LoggingEventDataFieldInfo.GetValue(loggingEvent);
-            loggingEventData.Message = JsonConvert.SerializeObject(exceptionWithInner[0]);
+            loggingEventData.Message = JsonConvert.SerializeObject(queueException);
             LoggingEventDataFieldInfo.SetValue(loggingEvent, loggingEventData);
 
             loggingEvent.Fix = FixFlags.All;

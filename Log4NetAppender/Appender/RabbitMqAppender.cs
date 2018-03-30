@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Reflection;
 using System.Text;
 using log4net.Appender;
 using log4net.Core;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 
 namespace Log4NetAppender.Appender
@@ -10,6 +14,9 @@ namespace Log4NetAppender.Appender
     {
         private ConnectionFactory _connectionFactory;
         private WorkerThread<LoggingEvent> _worker;
+        private static readonly FieldInfo LoggingEventDataFieldInfo = 
+            typeof(LoggingEvent).GetField("m_data", BindingFlags.Instance | BindingFlags.NonPublic);
+        private string _routingKey;
         public RabbitMqAppender()
         {
             HostName = "localhost";
@@ -23,7 +30,6 @@ namespace Log4NetAppender.Appender
             Environment = "";
             AppName = "";
         }
-
         public string HostName { get; set; }
         public string VirtualHost { get; set; }
         public string UserName { get; set; }
@@ -34,7 +40,6 @@ namespace Log4NetAppender.Appender
         public string Tennent { get; set; }
         public string Environment { get; set; }
         public string AppName { get; set; }
-        public string RoutingKey { get; set; }
 
         protected override void OnClose()
         {
@@ -44,6 +49,32 @@ namespace Log4NetAppender.Appender
 
         protected override void Append(LoggingEvent loggingEvent)
         {
+            var currentException = (Exception)loggingEvent.MessageObject;
+            var exceptionGuid = Guid.NewGuid();
+
+            var exceptionWithInner = new List<ExceptionTransformer>
+            {
+                new ExceptionTransformer(currentException, exceptionGuid, 0)
+            };
+
+            int.TryParse(ConfigurationManager.AppSettings["DepthOfLog"], out var depthOfLog);
+
+            for (var i = 0; i < depthOfLog; i++)
+            {
+                if (currentException.InnerException == null)
+                    break;
+
+                exceptionWithInner.Add(new ExceptionTransformer(currentException.InnerException, exceptionGuid, i + 1));
+                currentException = currentException.InnerException;
+            }
+
+            for (var i = 0; i < exceptionWithInner.Count - 1; ++i)
+                exceptionWithInner[i].InnerException = exceptionWithInner[i + 1];
+
+            var loggingEventData = (LoggingEventData)LoggingEventDataFieldInfo.GetValue(loggingEvent);
+            loggingEventData.Message = JsonConvert.SerializeObject(exceptionWithInner[0]);
+            LoggingEventDataFieldInfo.SetValue(loggingEvent, loggingEventData);
+
             loggingEvent.Fix = FixFlags.All;
             _worker.Enqueue(loggingEvent);
         }
@@ -51,7 +82,7 @@ namespace Log4NetAppender.Appender
         public override void ActivateOptions()
         {
 
-            RoutingKey = string.Join(".", Tennent.Replace(".", "%2E"), Environment.Replace(".", "%2E"), AppName.Replace(".", "%2E"));
+            _routingKey = string.Join(".", Tennent.Replace(".", "%2E"), Environment.Replace(".", "%2E"), AppName.Replace(".", "%2E"));
             _connectionFactory = new ConnectionFactory()
             {
                 HostName = HostName,
@@ -72,7 +103,7 @@ namespace Log4NetAppender.Appender
                 channel.ExchangeDeclare("HattrickExchange", "topic");
                 foreach (var log in logs)
                 {
-                    var completeRoutingKey = RoutingKey + "." + log.Level.DisplayName;
+                    var completeRoutingKey = _routingKey + "." + log.Level.DisplayName;
                     var body = Encoding.UTF8.GetBytes(log.RenderedMessage);
                     channel.BasicPublish("HattrickExchange", completeRoutingKey, null, body);
                     Console.WriteLine(" Ruta: '{0}' \nPoruka: '{1}'", completeRoutingKey, log.RenderedMessage);

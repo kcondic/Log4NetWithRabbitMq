@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using log4net;
 using Newtonsoft.Json;
 
 namespace Log4NetAppender
@@ -12,25 +13,55 @@ namespace Log4NetAppender
     {
         static void Main(string[] args)
         {
-            System.AppDomain.CurrentDomain.FirstChanceException += ExceptionLogger.ExceptionTrapper;
+            log4net.Config.BasicConfigurator.Configure();
+            var logger = LogManager.GetLogger(typeof(Program));
 
-            ThrowException();
-            ThrowException();
-            ThrowException();
-            
-            Console.ReadLine();
-        }
-
-        static void ThrowException()
-        {
             try
             {
                 throw new InvalidOperationException("ovo je vanjski", new InvalidOperationException("ovo je unutarnji", new InvalidOperationException("ovo je drugi unutarnji")));
             }
             catch (Exception e)
             {
-                Console.WriteLine("catch blok");
+                logger.Debug(e);
             }
+
+            try
+            {
+                throw new InvalidOperationException("ovo je vanjski", new InvalidOperationException("ovo je unutarnji", new InvalidOperationException("ovo je drugi unutarnji")));
+            }
+            catch (Exception e)
+            {
+                logger.Error(e);
+            }
+
+            try
+            {
+                throw new InvalidOperationException("ovo je vanjski", new InvalidOperationException("ovo je unutarnji", new InvalidOperationException("ovo je drugi unutarnji")));
+            }
+            catch (Exception e)
+            {
+                logger.Info(e);
+            }
+
+            try
+            {
+                throw new InvalidOperationException("ovo je vanjski", new InvalidOperationException("ovo je unutarnji", new InvalidOperationException("ovo je drugi unutarnji")));
+            }
+            catch (Exception e)
+            {
+                logger.Fatal(e);
+            }
+
+            try
+            {
+                throw new InvalidOperationException("ovo je vanjski", new InvalidOperationException("ovo je unutarnji", new InvalidOperationException("ovo je drugi unutarnji")));
+            }
+            catch (Exception e)
+            {
+                logger.Warn(e);
+            }
+
+            Console.ReadLine();
         }
     }
 }

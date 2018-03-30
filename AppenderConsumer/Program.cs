@@ -26,8 +26,7 @@ namespace AppenderConsumer
                 var willDeleteAfterConnection = false;
                 var routingKeys = new List<string>
                 {
-                    "consumer.test",
-                    "test.test"
+                    "#"
                 };
                 //omogućit korisniku biranje imena queuea i oće li se brisat nakon gašenja veze
                 channel.QueueDeclare(queueName, true, willDeleteAfterConnection, false, new Dictionary<string, object>

@@ -14,11 +14,9 @@ namespace Log4NetAppender
         {
             System.AppDomain.CurrentDomain.FirstChanceException += ExceptionLogger.ExceptionTrapper;
 
-            while (true)
-            {
-                ThrowException();
-                System.Threading.Thread.Sleep(3000);
-            }
+            ThrowException();
+            ThrowException();
+            ThrowException();
             
             Console.ReadLine();
         }

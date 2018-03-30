@@ -7,6 +7,7 @@ using System.Runtime.ExceptionServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
 using log4net;
 using Newtonsoft.Json;
 
@@ -17,21 +18,28 @@ namespace Log4NetAppender
         static ExceptionLogger()
         {
             log4net.Config.BasicConfigurator.Configure();
-            Logger = LogManager.GetLogger("RabbitMqAppender");
+            Logger = LogManager.GetLogger(typeof(ExceptionLogger));
         }
         private static ILog Logger { get; }
 
         public static void ExceptionTrapper(object sender, FirstChanceExceptionEventArgs e)
         {
             var currentException = e.Exception;
-            var exceptionWithInner = new List<ExceptionTransformer.ExceptionTransformer>
+            var exceptionGuid = Guid.NewGuid();
+
+            var exceptionWithInner = new List<ExceptionTransformer>
             {
-                new ExceptionTransformer.ExceptionTransformer(currentException)
+                new ExceptionTransformer(currentException, exceptionGuid, 0)
             };
 
-            while (currentException.InnerException != null)
+            int.TryParse(ConfigurationManager.AppSettings["DepthOfLog"], out var depthOfLog);
+         
+            for (var i = 0; i < depthOfLog; i++)
             {
-                exceptionWithInner.Add(new ExceptionTransformer.ExceptionTransformer(currentException.InnerException));
+                if (currentException.InnerException == null)
+                    break;
+
+                exceptionWithInner.Add(new ExceptionTransformer(currentException.InnerException, exceptionGuid, i+1));
                 currentException = currentException.InnerException;
             }
 

@@ -32,7 +32,9 @@ namespace AppenderConsumer
                 //omogućit korisniku biranje imena queuea i oće li se brisat nakon gašenja veze
                 channel.QueueDeclare(queueName, true, willDeleteAfterConnection, false, new Dictionary<string, object>
                 {
-                    { "x-queue-mode", "lazy" }
+                    { "x-queue-mode", "lazy" },
+                    { "x-max-length-bytes", 100000000},
+                    { "x-message-ttl", 172800000 }
                 });
 
                 foreach (var routingKey in routingKeys)
@@ -51,8 +53,6 @@ namespace AppenderConsumer
                 channel.BasicConsume(queueName, true, consumer);
                 Console.WriteLine(" Press [enter] to exit.");
                 Console.ReadLine();
-
-                //istraži razliku topic i header exchangea
             }
         }
     }

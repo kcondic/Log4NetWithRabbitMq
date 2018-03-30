@@ -16,9 +16,8 @@ namespace Log4NetAppender
     {
         static ExceptionLogger()
         {
-            log4net.Util.LogLog.InternalDebugging = true;
             log4net.Config.BasicConfigurator.Configure();
-            Logger = LogManager.GetLogger(typeof(Program));
+            Logger = LogManager.GetLogger("RabbitMqAppender");
         }
         private static ILog Logger { get; }
 

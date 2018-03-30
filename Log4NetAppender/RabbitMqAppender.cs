@@ -8,11 +8,11 @@ using log4net.Appender;
 
 namespace Log4NetAppender
 {
-    public class MqRabbitAppender : AppenderSkeleton
+    public class RabbitMqAppender : AppenderSkeleton
     {
         private ConnectionFactory _connectionFactory;
         private WorkerThread<LoggingEvent> _worker;
-        public MqRabbitAppender()
+        public RabbitMqAppender()
             {
                 HostName = "localhost";
                 VirtualHost = "/";
@@ -22,6 +22,7 @@ namespace Log4NetAppender
                 Port = 5672;
                 RoutingKey = "";
                 FlushInterval = 5;
+                DepthOfLog = 0;
             }
 
         public string HostName { get; set; }
@@ -32,6 +33,7 @@ namespace Log4NetAppender
         public int Port { get; set; }
         public string RoutingKey { get; set; }
         public int FlushInterval { get; set; }
+        public int DepthOfLog { get; set; }
 
         protected override void OnClose()
         {
@@ -61,8 +63,7 @@ namespace Log4NetAppender
 
         public void Process(LoggingEvent[] logs)
         {
-            var factory = new ConnectionFactory() {HostName = HostName, UserName = UserName, Password = Password };
-            using (var connection = factory.CreateConnection())
+            using (var connection = _connectionFactory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
                 channel.ExchangeDeclare("HattrickExchange", "topic");

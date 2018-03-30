@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace Log4NetAppender
+namespace Log4NetAppender.Appender
 {
     public class WorkerThread<T> : IDisposable
     {
@@ -48,13 +48,13 @@ namespace Log4NetAppender
 
         private void Dequeue()
         {
-            int count = _queue.Count;
+            var count = _queue.Count;
             if (count <= 0)
             {
                 return;
             }
             var items = new T[count];
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 _queue.TryDequeue(out items[i]);
             }

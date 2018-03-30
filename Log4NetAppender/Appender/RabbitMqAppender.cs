@@ -62,17 +62,17 @@ namespace Log4NetAppender.Appender
                 new TransformException(currentException, exceptionGuid, 0)
             };
 
-            for (var i = 0; i < DepthOfLog; i++)
+            for (var i=0; i<DepthOfLog; ++i)
             {
                 if (currentException.InnerException == null)
                     break;
 
-                exceptionWithInner.Add(new TransformException(currentException.InnerException, exceptionGuid, i + 1));
+                exceptionWithInner.Add(new TransformException(currentException.InnerException, exceptionGuid, i+1));
                 currentException = currentException.InnerException;
             }
 
-            for (var i = 0; i < exceptionWithInner.Count - 1; ++i)
-                exceptionWithInner[i].InnerException = exceptionWithInner[i + 1];
+            for (var i=0; i<exceptionWithInner.Count-1; ++i)
+                exceptionWithInner[i].InnerException = exceptionWithInner[i+1];
 
             var queueException = new QueueException(Tennent, Environment, AppName, loggingEvent.Level.DisplayName, exceptionWithInner[0]);
 

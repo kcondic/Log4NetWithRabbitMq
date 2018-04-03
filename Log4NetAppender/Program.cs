@@ -14,11 +14,14 @@ namespace Log4NetAppender
             log4net.Config.BasicConfigurator.Configure();
             var logger = LogManager.GetLogger(typeof(Program));
 
-            ConsumerRepo.DeclareQueue("test", false, new List<string>
+            var repo = new ConsumerRepo();
+
+            repo.DeclareQueue("test", false, new List<string>
             {
                 "#"
             });
-            ConsumerRepo.ConnectToQueue("test", 8);
+
+            repo.ConnectToQueue("test", 8);
 
             while (true)
             {

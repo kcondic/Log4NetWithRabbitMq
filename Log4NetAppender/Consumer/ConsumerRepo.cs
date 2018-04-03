@@ -13,16 +13,16 @@ namespace Log4NetAppender.Consumer
 {
     public class ConsumerRepo
     {
-        static ConsumerRepo()
+        public ConsumerRepo()
         {
-            ConnectionFactory = GetFactory();
-            Connection = CreateConnection();
-            Channel = CreateModel();
+            _connectionFactory = GetFactory();
+            _connection = GetConnection();
+            _channel = _connection.CreateModel();
         }
 
-        private static readonly IConnectionFactory ConnectionFactory;
-        private static readonly IConnection Connection;
-        private static readonly IModel Channel;
+        private readonly IConnectionFactory _connectionFactory;
+        private readonly IConnection _connection;
+        private IModel _channel;
 
         private static IConnectionFactory GetFactory()
         {
@@ -52,20 +52,15 @@ namespace Log4NetAppender.Consumer
             };
         }
 
-        private static IConnection CreateConnection()
+        private IConnection GetConnection()
         {
-            return ConnectionFactory.CreateConnection();
+            return _connectionFactory.CreateConnection();
         }
 
-        private static IModel CreateModel()
+        public void DeclareQueue(string queueName, bool willDeleteAfterConnectionClose, IEnumerable<string> routingKeys)
         {
-            return Connection.CreateModel();
-        }
-
-        public static void DeclareQueue(string queueName, bool willDeleteAfterConnectionClose, IEnumerable<string> routingKeys)
-        {
-            Channel.ExchangeDeclare("HattrickExchange", "topic");
-            Channel.QueueDeclare(queueName, true, willDeleteAfterConnectionClose, false,
+            _channel.ExchangeDeclare("HattrickExchange", "topic");
+            _channel.QueueDeclare(queueName, true, willDeleteAfterConnectionClose, false,
                 new Dictionary<string, object>
                 {
                         {"x-queue-mode", "lazy"},
@@ -74,20 +69,21 @@ namespace Log4NetAppender.Consumer
                 });
 
             foreach (var routingKey in routingKeys)
-                Channel.QueueBind(queueName, "HattrickExchange", routingKey);
+                _channel.QueueBind(queueName, "HattrickExchange", routingKey);
         }
 
-        public static void ConnectToQueue(string queueToConnectToName, int numberOfThreads=1)
+        public void ConnectToQueue(string queueToConnectToName, int numberOfThreads=1)
         {
-            //neće ovako, moraju se otvarat novi channeli
+            //neće ovako, moraju se otvarat novi channeli, po jedan za svakog consumera
             for (var i = 0; i < numberOfThreads; ++i)
             {
+                _channel = _connection.CreateModel();
                 new Thread(() =>
                 {
                     Thread.CurrentThread.Name = i.ToString();
                     Console.WriteLine($"Postavili smo ime na: {Thread.CurrentThread.Name}");
                     Thread.CurrentThread.IsBackground = true;
-                    var consumer = new EventingBasicConsumer(Channel);
+                    var consumer = new EventingBasicConsumer(_channel);
                     consumer.Received += (model, ea) =>
                     {
                         var body = ea.Body;
@@ -95,16 +91,16 @@ namespace Log4NetAppender.Consumer
                         var msgRoutingKey = ea.RoutingKey;
                         Console.WriteLine($"NIT BROJ: {Thread.CurrentThread.Name}\nPRIMLJENO: '{msgRoutingKey}' \nPORUKA: '{message}'");
                         DeserializeAndConsume(message);
-                        Channel.BasicAck(ea.DeliveryTag, false);
+                        _channel.BasicAck(ea.DeliveryTag, false);
                     };
-                    Channel.BasicConsume(queueToConnectToName, false, consumer);
+                    _channel.BasicConsume(queueToConnectToName, false, consumer);
                 }).Start();
             }
         }
 
-        public static void DisconnectFromQueue(string consumerToDisconnectTag)
+        public void DisconnectFromQueue(string consumerToDisconnectTag)
         {
-            Channel.BasicCancel(consumerToDisconnectTag);
+            _channel.BasicCancel(consumerToDisconnectTag);
         }
 
         private static void DeserializeAndConsume(string messageToConsume)
@@ -112,14 +108,14 @@ namespace Log4NetAppender.Consumer
             return;
         }
 
-        public static void DeleteQueue(string queueToDeleteName)
+        public void DeleteQueue(string queueToDeleteName)
         {
-            Channel.QueueDelete(queueToDeleteName, false, true);
+            _channel.QueueDelete(queueToDeleteName, false, true);
         }
 
-        public static void CloseConnection()
+        public void CloseConnection()
         {
-            Connection.Close();
+            _connection.Close();
         }
     }
 }

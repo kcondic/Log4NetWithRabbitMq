@@ -26,6 +26,7 @@ namespace Log4NetAppender.Appender
             Environment = "";
             AppName = "";
             DepthOfLog = 0;
+            NumberOfThreads = 1;
         }
 
         private ConnectionFactory _connectionFactory;
@@ -44,7 +45,9 @@ namespace Log4NetAppender.Appender
         public string Tennent { get; set; }
         public string Environment { get; set; }
         public string AppName { get; set; }
-        public int DepthOfLog { get; set; }
+        public uint DepthOfLog { get; set; }
+        public uint NumberOfThreads { get; set; }
+
 
         protected override void OnClose()
         {
@@ -111,7 +114,6 @@ namespace Log4NetAppender.Appender
                     var completeRoutingKey = _routingKey + "." + log.Level.DisplayName;
                     var body = Encoding.UTF8.GetBytes(log.RenderedMessage);
                     channel.BasicPublish("HattrickExchange", completeRoutingKey, null, body);
-                    Console.WriteLine(" Ruta: '{0}' \nPoruka: '{1}'", completeRoutingKey, log.RenderedMessage);
                 }
             }
         }

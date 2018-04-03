@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using log4net;
 using Log4NetAppender.Appender;
 using RabbitMQ.Client;
@@ -9,7 +11,7 @@ using RabbitMQ.Client.Events;
 
 namespace Log4NetAppender.Consumer
 {
-    public static class ConsumerRepo
+    public class ConsumerRepo
     {
         static ConsumerRepo()
         {
@@ -34,7 +36,7 @@ namespace Log4NetAppender.Consumer
                     HostName = "localhost",
                     VirtualHost = "/",
                     UserName = "guest",
-                    Password = "testtest",
+                    Password = "guest",
                     RequestedHeartbeat = 0,
                     Port = 5672
                 };
@@ -44,7 +46,7 @@ namespace Log4NetAppender.Consumer
                 HostName = rabbitAppenderConfig.HostName ?? "localhost",
                 VirtualHost = rabbitAppenderConfig.VirtualHost ?? "/",
                 UserName = rabbitAppenderConfig.UserName ?? "guest",
-                Password = rabbitAppenderConfig.Password ?? "guest",
+                Password = rabbitAppenderConfig.Password ?? "testtest",
                 RequestedHeartbeat = rabbitAppenderConfig.RequestedHeartbeat,
                 Port = rabbitAppenderConfig.Port != 0 ? rabbitAppenderConfig.Port : 5672
             };
@@ -75,19 +77,29 @@ namespace Log4NetAppender.Consumer
                 Channel.QueueBind(queueName, "HattrickExchange", routingKey);
         }
 
-        public static string ConnectToQueue(string queueToConnectToName)
+        public static void ConnectToQueue(string queueToConnectToName, int numberOfThreads=1)
         {
-            var consumer = new EventingBasicConsumer(Channel);
-            consumer.Received += (model, ea) =>
+            //neće ovako, moraju se otvarat novi channeli
+            for (var i = 0; i < numberOfThreads; ++i)
             {
-                var body = ea.Body;
-                var message = Encoding.UTF8.GetString(body);
-                var msgRoutingKey = ea.RoutingKey;
-                Console.WriteLine(" Primljena ruta: '{0}' \nPoruka: '{1}'", msgRoutingKey, message);
-                DeserializeAndConsume(message);
-            };
-            var consumerTag = Channel.BasicConsume(queueToConnectToName, true, consumer);
-            return consumerTag;
+                new Thread(() =>
+                {
+                    Thread.CurrentThread.Name = i.ToString();
+                    Console.WriteLine($"Postavili smo ime na: {Thread.CurrentThread.Name}");
+                    Thread.CurrentThread.IsBackground = true;
+                    var consumer = new EventingBasicConsumer(Channel);
+                    consumer.Received += (model, ea) =>
+                    {
+                        var body = ea.Body;
+                        var message = Encoding.UTF8.GetString(body);
+                        var msgRoutingKey = ea.RoutingKey;
+                        Console.WriteLine($"NIT BROJ: {Thread.CurrentThread.Name}\nPRIMLJENO: '{msgRoutingKey}' \nPORUKA: '{message}'");
+                        DeserializeAndConsume(message);
+                        Channel.BasicAck(ea.DeliveryTag, false);
+                    };
+                    Channel.BasicConsume(queueToConnectToName, false, consumer);
+                }).Start();
+            }
         }
 
         public static void DisconnectFromQueue(string consumerToDisconnectTag)

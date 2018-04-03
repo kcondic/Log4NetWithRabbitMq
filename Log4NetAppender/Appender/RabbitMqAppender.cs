@@ -26,7 +26,6 @@ namespace Log4NetAppender.Appender
             Environment = "";
             AppName = "";
             DepthOfLog = 0;
-            NumberOfThreads = 1;
         }
 
         private ConnectionFactory _connectionFactory;
@@ -46,7 +45,6 @@ namespace Log4NetAppender.Appender
         public string Environment { get; set; }
         public string AppName { get; set; }
         public uint DepthOfLog { get; set; }
-        public uint NumberOfThreads { get; set; }
 
 
         protected override void OnClose()

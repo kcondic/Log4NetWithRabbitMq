@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading;
 using log4net;
 using Log4NetAppender.Appender;
+using Log4NetAppender.ExceptionDatabase;
+using Log4NetAppender.ExceptionStructure;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -77,6 +80,8 @@ namespace Log4NetAppender.Consumer
             for (var i = 0; i < numberOfThreads; ++i)
             {
                 var channel = _connection.CreateModel();
+                var context = new ExceptionContext();
+                channel.BasicQos(0, 1, false);
                 new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
@@ -87,7 +92,7 @@ namespace Log4NetAppender.Consumer
                         var message = Encoding.UTF8.GetString(body);
                         var msgRoutingKey = ea.RoutingKey;
                         Console.WriteLine($"PRIMLJENO: '{msgRoutingKey}' \nPORUKA: '{message}'");
-                        DeserializeAndConsume(message);
+                        DeserializeAndConsume(message, context);
                         channel.BasicAck(ea.DeliveryTag, false);
                     };
                     channel.BasicConsume(queueToConnectToName, false, consumer);
@@ -100,9 +105,25 @@ namespace Log4NetAppender.Consumer
             _channel.BasicCancel(consumerToDisconnectTag);
         }
 
-        private static void DeserializeAndConsume(string messageToConsume)
+        private void DeserializeAndConsume(string messageToConsume, ExceptionContext contextOfThread)
         {
-            return;
+            var deserializedQueueException = JsonConvert.DeserializeObject<QueueException>(messageToConsume);
+            var topLevelException = deserializedQueueException.Exception;
+            while (topLevelException.InnerException != null)
+            {
+                try
+                {
+                    contextOfThread.TransformExceptions.Add(topLevelException);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+                topLevelException = topLevelException.InnerException;
+            }
+            contextOfThread.QueueExceptions.Add(deserializedQueueException);
+            contextOfThread.SaveChanges();
         }
 
         public void DeleteQueue(string queueToDeleteName)

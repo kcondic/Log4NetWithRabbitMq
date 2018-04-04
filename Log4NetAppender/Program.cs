@@ -18,15 +18,13 @@ namespace Log4NetAppender
             var logger = LogManager.GetLogger(typeof(Program));
 
             var repo = new ConsumerRepo();
-
             repo.DeclareQueue("test", false, new List<string>
             {
                 "#"
             });
-
             repo.ConnectToQueue("test", 4);
 
-            //for (var i = 0; i < 10000; ++i)
+            //for (var i = 0; i < 100; ++i)
             //{
             //    try
             //    {
@@ -37,7 +35,7 @@ namespace Log4NetAppender
             //        logger.Debug(e);
             //    }
             //}
-            //Console.ReadLine();
+            Console.ReadLine();
         }
     }
 }

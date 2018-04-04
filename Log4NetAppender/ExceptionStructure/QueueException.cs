@@ -1,11 +1,18 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace Log4NetAppender.ExceptionStructure
 {
     public class QueueException
     {
+        [JsonConstructor]
+        private QueueException()
+        {           
+        }
+
         public QueueException(string tennent, string environment, string appName, string logLevel, TransformException topLevelException)
         {
+            ExceptionId = topLevelException.ExceptionId;
             Tennent = tennent;
             Environment = environment;
             AppName = appName;
@@ -14,11 +21,13 @@ namespace Log4NetAppender.ExceptionStructure
             TimeOfException = DateTime.UtcNow;
         }
 
-        public string Tennent { get; }
-        public string Environment { get; }
-        public string AppName { get; }
-        public string Status { get; }
-        public TransformException Exception { get; }
-        public DateTime TimeOfException { get; }
+        // setters needed for JSON deserialization
+        public Guid ExceptionId { get; set; }
+        public string Tennent { get; set; }
+        public string Environment { get; set; }
+        public string AppName { get; set; }
+        public string Status { get; set; }
+        public TransformException Exception { get; set; }
+        public DateTime TimeOfException { get; set; }
     }
 }

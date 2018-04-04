@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="Appender\RabbitMqAppender.cs" />
     <Compile Include="Consumer\ConsumerRepo.cs" />
+    <Compile Include="ExceptionDatabase\ExceptionContext.cs" />
     <Compile Include="ExceptionStructure\TransformException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

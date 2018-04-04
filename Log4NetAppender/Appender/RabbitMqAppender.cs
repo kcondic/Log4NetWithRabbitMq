@@ -104,16 +104,16 @@ namespace Log4NetAppender.Appender
         public void Process(LoggingEvent[] logs)
         {
             using (var connection = _connectionFactory.CreateConnection())
-            using (var channel = connection.CreateModel())
-            {
-                channel.ExchangeDeclare("HattrickExchange", "topic");
-                foreach (var log in logs)
+                using (var channel = connection.CreateModel())
                 {
-                    var completeRoutingKey = _routingKey + "." + log.Level.DisplayName;
-                    var body = Encoding.UTF8.GetBytes(log.RenderedMessage);
-                    channel.BasicPublish("HattrickExchange", completeRoutingKey, null, body);
+                    channel.ExchangeDeclare("HattrickExchange", "topic");
+                    foreach (var log in logs)
+                    {
+                        var completeRoutingKey = _routingKey + "." + log.Level.DisplayName;
+                        var body = Encoding.UTF8.GetBytes(log.RenderedMessage);
+                        channel.BasicPublish("HattrickExchange", completeRoutingKey, null, body);
+                    }
                 }
-            }
         }
     }
 }

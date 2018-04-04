@@ -22,7 +22,7 @@ namespace Log4NetAppender.Consumer
 
         private readonly IConnectionFactory _connectionFactory;
         private readonly IConnection _connection;
-        private IModel _channel;
+        private readonly IModel _channel;
 
         private static IConnectionFactory GetFactory()
         {
@@ -74,26 +74,23 @@ namespace Log4NetAppender.Consumer
 
         public void ConnectToQueue(string queueToConnectToName, int numberOfThreads=1)
         {
-            //neće ovako, moraju se otvarat novi channeli, po jedan za svakog consumera
             for (var i = 0; i < numberOfThreads; ++i)
             {
-                _channel = _connection.CreateModel();
+                var channel = _connection.CreateModel();
                 new Thread(() =>
                 {
-                    Thread.CurrentThread.Name = i.ToString();
-                    Console.WriteLine($"Postavili smo ime na: {Thread.CurrentThread.Name}");
                     Thread.CurrentThread.IsBackground = true;
-                    var consumer = new EventingBasicConsumer(_channel);
+                    var consumer = new EventingBasicConsumer(channel);
                     consumer.Received += (model, ea) =>
                     {
                         var body = ea.Body;
                         var message = Encoding.UTF8.GetString(body);
                         var msgRoutingKey = ea.RoutingKey;
-                        Console.WriteLine($"NIT BROJ: {Thread.CurrentThread.Name}\nPRIMLJENO: '{msgRoutingKey}' \nPORUKA: '{message}'");
+                        Console.WriteLine($"PRIMLJENO: '{msgRoutingKey}' \nPORUKA: '{message}'");
                         DeserializeAndConsume(message);
-                        _channel.BasicAck(ea.DeliveryTag, false);
+                        channel.BasicAck(ea.DeliveryTag, false);
                     };
-                    _channel.BasicConsume(queueToConnectToName, false, consumer);
+                    channel.BasicConsume(queueToConnectToName, false, consumer);
                 }).Start();
             }
         }

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
 using log4net;
 using Log4NetAppender.Consumer;
 
@@ -21,21 +24,20 @@ namespace Log4NetAppender
                 "#"
             });
 
-            repo.ConnectToQueue("test", 8);
+            repo.ConnectToQueue("test", 4);
 
-            while (true)
-            {
-                try
-                {
-                    throw new InvalidOperationException("ovo je vanjski", new InvalidOperationException("ovo je unutarnji", new InvalidOperationException("ovo je drugi unutarnji")));
-                }
-                catch (Exception e)
-                {
-                    logger.Debug(e);
-                    System.Threading.Thread.Sleep(1000);
-                }
-            }
-            Console.ReadLine();
+            //for (var i = 0; i < 10000; ++i)
+            //{
+            //    try
+            //    {
+            //        throw new InvalidOperationException("ovo je vanjski", new InvalidOperationException("ovo je unutarnji", new InvalidOperationException("ovo je drugi unutarnji")));
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        logger.Debug(e);
+            //    }
+            //}
+            //Console.ReadLine();
         }
     }
 }

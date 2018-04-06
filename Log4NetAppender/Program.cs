@@ -25,7 +25,7 @@ namespace Log4NetAppender
             });
             repo.ConnectToQueue("test", 8);
 
-            //for (var i = 0; i < 1000; ++i)
+            //for (var i = 0; i < 100; ++i)
             //{
             //    try
             //    {

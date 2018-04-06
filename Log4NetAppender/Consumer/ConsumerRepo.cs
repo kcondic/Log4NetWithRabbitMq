@@ -91,6 +91,7 @@ namespace Log4NetAppender.Consumer
                     consumer.Received += (model, ea) =>
                     {
                         var message = Encoding.UTF8.GetString(ea.Body);
+                        Console.WriteLine("IDE IDE");
                         DeserializeAndConsume(message, context);
                         channel.BasicAck(ea.DeliveryTag, false);
                     };
@@ -107,6 +108,9 @@ namespace Log4NetAppender.Consumer
         private void DeserializeAndConsume(string messageToConsume, ExceptionContext contextOfThread)
         {
             var deserializedQueueException = JsonConvert.DeserializeObject<QueueException>(messageToConsume);
+            //if (deserializedQueueException.Equals(_lastQueueException))
+            //    return;
+            //_lastQueueException = deserializedQueueException;
             var topLevelException = deserializedQueueException.Exception;
             while (topLevelException.InnerException != null)
             {

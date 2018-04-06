@@ -22,7 +22,7 @@ namespace Log4NetAppender.Appender
             RequestedHeartbeat = 0;
             Port = 5672;
             FlushInterval = 5;
-            Tennent = "";
+            Tenent = "";
             Environment = "";
             AppName = "";
             DepthOfLog = 0;
@@ -41,7 +41,7 @@ namespace Log4NetAppender.Appender
         public ushort RequestedHeartbeat { get; set; }
         public int Port { get; set; }
         public int FlushInterval { get; set; }
-        public string Tennent { get; set; }
+        public string Tenent { get; set; }
         public string Environment { get; set; }
         public string AppName { get; set; }
         public uint DepthOfLog { get; set; }
@@ -75,7 +75,7 @@ namespace Log4NetAppender.Appender
             for (var i=0; i<exceptionWithInner.Count-1; ++i)
                 exceptionWithInner[i].InnerException = exceptionWithInner[i+1];
 
-            var queueException = new QueueException(Tennent, Environment, AppName, loggingEvent.Level.DisplayName, exceptionWithInner[0]);
+            var queueException = new QueueException(Tenent, Environment, AppName, loggingEvent.Level.DisplayName, exceptionWithInner[0]);
 
             var loggingEventData = (LoggingEventData)LoggingEventDataFieldInfo.GetValue(loggingEvent);
             loggingEventData.Message = JsonConvert.SerializeObject(queueException);
@@ -87,8 +87,7 @@ namespace Log4NetAppender.Appender
 
         public override void ActivateOptions()
         {
-
-            _routingKey = string.Join(".", Tennent.Replace(".", "%2E"), Environment.Replace(".", "%2E"), AppName.Replace(".", "%2E"));
+            _routingKey = string.Join(".", Tenent.Replace(".", "%2E"), Environment.Replace(".", "%2E"), AppName.Replace(".", "%2E"));
             _connectionFactory = new ConnectionFactory()
             {
                 HostName = HostName,

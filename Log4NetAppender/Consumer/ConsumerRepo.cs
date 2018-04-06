@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using log4net;
 using Log4NetAppender.Appender;
 using Log4NetAppender.ExceptionDatabase;
@@ -62,7 +64,7 @@ namespace Log4NetAppender.Consumer
 
         public void DeclareQueue(string queueName, bool willDeleteAfterConnectionClose, IEnumerable<string> routingKeys)
         {
-            _channel.ExchangeDeclare("HattrickExchange", "topic");
+            _channel.ExchangeDeclare("HattrickExchange", "topic", true);
             _channel.QueueDeclare(queueName, true, willDeleteAfterConnectionClose, false,
                 new Dictionary<string, object>
                 {
@@ -88,10 +90,7 @@ namespace Log4NetAppender.Consumer
                     var consumer = new EventingBasicConsumer(channel);
                     consumer.Received += (model, ea) =>
                     {
-                        var body = ea.Body;
-                        var message = Encoding.UTF8.GetString(body);
-                        var msgRoutingKey = ea.RoutingKey;
-                        Console.WriteLine($"PRIMLJENO: '{msgRoutingKey}' \nPORUKA: '{message}'");
+                        var message = Encoding.UTF8.GetString(ea.Body);
                         DeserializeAndConsume(message, context);
                         channel.BasicAck(ea.DeliveryTag, false);
                     };
@@ -111,15 +110,7 @@ namespace Log4NetAppender.Consumer
             var topLevelException = deserializedQueueException.Exception;
             while (topLevelException.InnerException != null)
             {
-                try
-                {
-                    contextOfThread.TransformExceptions.Add(topLevelException);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+                contextOfThread.TransformExceptions.Add(topLevelException);
                 topLevelException = topLevelException.InnerException;
             }
             contextOfThread.QueueExceptions.Add(deserializedQueueException);

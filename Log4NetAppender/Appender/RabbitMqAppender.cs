@@ -106,7 +106,7 @@ namespace Log4NetAppender.Appender
             using (var connection = _connectionFactory.CreateConnection())
                 using (var channel = connection.CreateModel())
                 {
-                    channel.ExchangeDeclare("HattrickExchange", "topic");
+                    channel.ExchangeDeclare("HattrickExchange", "topic", true);
                     foreach (var log in logs)
                     {
                         var completeRoutingKey = _routingKey + "." + log.Level.DisplayName;

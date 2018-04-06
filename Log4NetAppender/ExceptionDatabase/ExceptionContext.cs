@@ -23,7 +23,7 @@ namespace Log4NetAppender.ExceptionDatabase
             modelBuilder.Entity<QueueException>()
                 .HasKey(x => x.ExceptionId);
             modelBuilder.Entity<TransformException>()
-                .HasKey(x => x.ExceptionId);
+                .HasKey(x => new {x.ExceptionId, x.Order});
             base.OnModelCreating(modelBuilder);
         }
     }

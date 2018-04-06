@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using log4net;
 using Log4NetAppender.Consumer;
 
@@ -22,9 +23,9 @@ namespace Log4NetAppender
             {
                 "#"
             });
-            repo.ConnectToQueue("test", 4);
+            repo.ConnectToQueue("test", 8);
 
-            //for (var i = 0; i < 100; ++i)
+            //for (var i = 0; i < 1000; ++i)
             //{
             //    try
             //    {
@@ -35,7 +36,7 @@ namespace Log4NetAppender
             //        logger.Debug(e);
             //    }
             //}
-            Console.ReadLine();
+            //Console.ReadLine();
         }
     }
 }

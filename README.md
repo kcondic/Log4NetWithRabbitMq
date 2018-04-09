@@ -22,7 +22,7 @@ Testing solutions to log exception info via log4net to RabbitMQ
   <logger name="ExceptionLogger" additivity="false">
       <level value="ALL" />
       <appender-ref ref="RabbitMqAppender" />
-    </logger>
+  </logger>
 </log4net>
 ```
 
@@ -48,11 +48,11 @@ var logger = LogManager.GetLogger("ExceptionLogger");
 logger.Debug(e); // or some other level's method, e is an exception
 ```
 ### **Default levels**
-1. Debug
-2. Info
-3. Warn
-4. Error
-5. Fatal
+1. **Debug**
+2. **Info**
+3. **Warn**
+4. **Error**
+5. **Fatal**
 
 ## **Consumer config**
 Reuse config from publisher, or add key value pairs to appSettings:

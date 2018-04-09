@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using log4net;
-using Log4NetAppender.Consumer;
 
 namespace Log4NetAppender
 {
@@ -12,14 +10,14 @@ namespace Log4NetAppender
             Console.WriteLine("Čekam poruke...");
 
             log4net.Config.BasicConfigurator.Configure();
-            var logger = LogManager.GetLogger(typeof(Program));
+            var logger = LogManager.GetLogger("ExceptionLogger");
 
-            var repo = new ConsumerRepo();
-            repo.DeclareQueue("test", false, new List<string>
-            {
-                "#"
-            });
-            repo.ConnectToQueue("test", 8);
+            //var repo = new ConsumerRepo();
+            //repo.DeclareQueue("test", false, new List<string>
+            //{
+            //    "#"
+            //});
+            //repo.ConnectToQueue("test", 8);
 
             for (var i = 0; i < 100; ++i)
             {

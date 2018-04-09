@@ -19,9 +19,10 @@ Testing solutions to log exception info via log4net to RabbitMQ
     <AppName value="livebet" />
     <DepthOfLog value="2" />
   </appender>
-  <root>
-    <appender-ref ref="RabbitMqAppender" />
-  </root>
+  <logger name="ExceptionLogger" additivity="false">
+      <level value="ALL" />
+      <appender-ref ref="RabbitMqAppender" />
+    </logger>
 </log4net>
 ```
 
@@ -43,7 +44,7 @@ Testing solutions to log exception info via log4net to RabbitMQ
 ## **Publisher usage**
 ```C#
 log4net.Config.BasicConfigurator.Configure();
-var logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+var logger = LogManager.GetLogger("ExceptionLogger");
 logger.Debug(e); // or some other level's method, e is an exception
 ```
 ### **Default levels**

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -105,12 +106,25 @@ namespace Log4NetAppender.Consumer
             _channel.BasicCancel(consumerToDisconnectTag);
         }
 
-        private void DeserializeAndConsume(string messageToConsume, ExceptionContext contextOfThread)
+        private static void DeserializeAndConsume(string messageToConsume, ExceptionContext contextOfThread)
         {
             var deserializedQueueException = JsonConvert.DeserializeObject<QueueException>(messageToConsume);
-            //if (deserializedQueueException.Equals(_lastQueueException))
-            //    return;
-            //_lastQueueException = deserializedQueueException;
+            try
+            {
+            if (contextOfThread.QueueExceptions.Count(exception => exception.Tenent == deserializedQueueException.Tenent &&
+                    exception.Environment == deserializedQueueException.Environment &&
+                    exception.AppName == deserializedQueueException.AppName && 
+                    exception.Status == deserializedQueueException.Status && 
+                    DbFunctions.DiffSeconds(exception.TimeOfException, deserializedQueueException.TimeOfException) <= 0.5 && 
+                    exception.Exception.Message == deserializedQueueException.Exception.Message && 
+                    exception.Exception.StackTrace == deserializedQueueException.Exception.StackTrace) > 3)
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
             var topLevelException = deserializedQueueException.Exception;
             while (topLevelException.InnerException != null)
             {

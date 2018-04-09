@@ -25,18 +25,18 @@ namespace Log4NetAppender
             });
             repo.ConnectToQueue("test", 8);
 
-            //for (var i = 0; i < 100; ++i)
-            //{
-            //    try
-            //    {
-            //        throw new InvalidOperationException("ovo je vanjski", new InvalidOperationException("ovo je unutarnji", new InvalidOperationException("ovo je drugi unutarnji")));
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        logger.Debug(e);
-            //    }
-            //}
-            //Console.ReadLine();
+            for (var i = 0; i < 100; ++i)
+            {
+                try
+                {
+                    throw new InvalidOperationException("ovo je vanjski", new InvalidOperationException("ovo je unutarnji", new InvalidOperationException("ovo je drugi unutarnji")));
+                }
+                catch (Exception e)
+                {
+                    logger.Debug(e);
+                }
+            }
+            Console.ReadLine();
         }
     }
 }

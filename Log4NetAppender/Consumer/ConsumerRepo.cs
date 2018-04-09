@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Entity;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Reflection;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using log4net;
 using Log4NetAppender.Appender;
 using Log4NetAppender.ExceptionDatabase;
@@ -36,25 +35,28 @@ namespace Log4NetAppender.Consumer
                                                  .GetAppenders()
                                                  .SingleOrDefault(appender => appender.Name == "RabbitMqAppender") as RabbitMqAppender;
 
-            if (rabbitAppenderConfig == null)
+            if (rabbitAppenderConfig != null)
                 return new ConnectionFactory()
                 {
-                    HostName = "localhost",
-                    VirtualHost = "/",
-                    UserName = "guest",
-                    Password = "guest",
-                    RequestedHeartbeat = 0,
-                    Port = 5672
+                    HostName = rabbitAppenderConfig.HostName,
+                    VirtualHost = rabbitAppenderConfig.VirtualHost,
+                    UserName = rabbitAppenderConfig.UserName,
+                    Password = rabbitAppenderConfig.Password,
+                    RequestedHeartbeat = rabbitAppenderConfig.RequestedHeartbeat,
+                    Port = rabbitAppenderConfig.Port
                 };
+
+            var manualConfig = ConfigurationManager.AppSettings;
 
             return new ConnectionFactory()
             {
-                HostName = rabbitAppenderConfig.HostName ?? "localhost",
-                VirtualHost = rabbitAppenderConfig.VirtualHost ?? "/",
-                UserName = rabbitAppenderConfig.UserName ?? "guest",
-                Password = rabbitAppenderConfig.Password ?? "testtest",
-                RequestedHeartbeat = rabbitAppenderConfig.RequestedHeartbeat,
-                Port = rabbitAppenderConfig.Port != 0 ? rabbitAppenderConfig.Port : 5672
+                HostName = manualConfig["HostName"] ?? "localhost",
+                VirtualHost = manualConfig["VirtualHost"] ?? "/",
+                UserName = manualConfig["UserName"] ?? "guest",
+                Password = manualConfig["Password"] ?? "guest",
+                RequestedHeartbeat = manualConfig["RequestedHeartBeat"] != null && 
+                                     int.TryParse(manualConfig["RequestedHeartBeat"], out var heartBeat) ? (ushort)heartBeat : (ushort)0,
+                Port = manualConfig["Port"] != null && int.TryParse(manualConfig["Port"], out var port) ? port : 5672
             };
         }
 
@@ -109,22 +111,25 @@ namespace Log4NetAppender.Consumer
         private static void DeserializeAndConsume(string messageToConsume, ExceptionContext contextOfThread)
         {
             var deserializedQueueException = JsonConvert.DeserializeObject<QueueException>(messageToConsume);
-            try
-            {
-            if (contextOfThread.QueueExceptions.Count(exception => exception.Tenent == deserializedQueueException.Tenent &&
+            var alreadyExistingOccurrencesOfException =
+                contextOfThread.QueueExceptions.Where(exception =>
+                    exception.Tenent == deserializedQueueException.Tenent &&
                     exception.Environment == deserializedQueueException.Environment &&
-                    exception.AppName == deserializedQueueException.AppName && 
-                    exception.Status == deserializedQueueException.Status && 
-                    DbFunctions.DiffSeconds(exception.TimeOfException, deserializedQueueException.TimeOfException) <= 0.5 && 
-                    exception.Exception.Message == deserializedQueueException.Exception.Message && 
-                    exception.Exception.StackTrace == deserializedQueueException.Exception.StackTrace) > 3)
+                    exception.AppName == deserializedQueueException.AppName &&
+                    exception.Status == deserializedQueueException.Status &&
+                    exception.Exception.StackTrace == deserializedQueueException.Exception.StackTrace);
+
+            if (alreadyExistingOccurrencesOfException.Any() && alreadyExistingOccurrencesOfException.All(exception => exception.IsAlreadyConsumed))
+                return;
+
+            if (alreadyExistingOccurrencesOfException.Count() > 3)
+            {
+                foreach (var exception in alreadyExistingOccurrencesOfException)
+                    exception.IsAlreadyConsumed = true;
+                contextOfThread.SaveChanges();
                 return;
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+
             var topLevelException = deserializedQueueException.Exception;
             while (topLevelException.InnerException != null)
             {

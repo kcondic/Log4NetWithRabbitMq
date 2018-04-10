@@ -1,7 +1,7 @@
 ﻿using System.Data.Entity;
-using Log4NetAppender.ExceptionStructure;
+using HSG.Exception.Logging.ExceptionStructure;
 
-namespace Log4NetAppender.ExceptionDatabase
+namespace HSG.Exception.Logging.ExceptionDatabase
 {
     public class ExceptionContext : DbContext
     {

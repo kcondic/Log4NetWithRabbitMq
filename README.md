@@ -7,7 +7,7 @@ Testing solutions to log exception info via log4net to RabbitMQ
     <section name="log4net" type="log4net.Config.Log4NetConfigurationSectionHandler, log4net" />
 </configSections>
 <log4net>
-  <appender name="RabbitMqAppender" type="Log4NetAppender.Appender.RabbitMqAppender">
+  <appender name="RabbitMqAppender" type="HSG.Exception.Logging.Appender.RabbitMqAppender, HSG.Exception.Logging">
     <HostName value="localhost" />
     <VirtualHost value="/" />
     <UserName value="guest" />

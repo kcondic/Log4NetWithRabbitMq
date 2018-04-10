@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>HSG.Exception.Logging</id>
+    <version>1.0.0</version>
+    <title>HSG.Exception.Logging</title>
+    <authors>Kresimir Condic</authors>
+    <owners>Hattrick Sports Group</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Exception logger that uses log4net for publishing to RabbitMQ queues,
+    and RabbitMQ client for consuming exception messages.
+    </description>
+    <releaseNotes>Initial release.</releaseNotes>
+    <copyright>Copyright 2018</copyright>
+  </metadata>
+</package>

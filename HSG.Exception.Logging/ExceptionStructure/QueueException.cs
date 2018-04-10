@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Log4NetAppender.ExceptionStructure
+namespace HSG.Exception.Logging.ExceptionStructure
 {
     public class QueueException
     {

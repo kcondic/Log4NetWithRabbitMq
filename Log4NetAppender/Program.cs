@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using HSG.Exception.Logging.Consumer;
 using log4net;
 
 namespace Log4NetAppender
@@ -12,12 +14,12 @@ namespace Log4NetAppender
             log4net.Config.BasicConfigurator.Configure();
             var logger = LogManager.GetLogger("ExceptionLogger");
 
-            //var repo = new ConsumerRepo();
-            //repo.DeclareQueue("test", false, new List<string>
-            //{
-            //    "#"
-            //});
-            //repo.ConnectToQueue("test", 8);
+            var repo = new ConsumerRepo();
+            repo.DeclareQueue("test", false, new List<string>
+            {
+                "#"
+            });
+            repo.ConnectToQueue("test", 8);
 
             for (var i = 0; i < 100; ++i)
             {

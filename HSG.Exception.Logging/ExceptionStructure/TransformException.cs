@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Log4NetAppender.ExceptionStructure
+namespace HSG.Exception.Logging.ExceptionStructure
 {
     public class TransformException
     {
@@ -10,7 +10,7 @@ namespace Log4NetAppender.ExceptionStructure
         {
         }
 
-        public TransformException(Exception exceptionToTransform, Guid exceptionGuid, int exceptionOrder)
+        public TransformException(System.Exception exceptionToTransform, Guid exceptionGuid, int exceptionOrder)
         {
             ExceptionId = exceptionGuid;
             Message = exceptionToTransform.Message;

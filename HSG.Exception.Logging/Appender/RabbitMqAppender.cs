@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using HSG.Exception.Logging.ExceptionStructure;
 using log4net.Appender;
 using log4net.Core;
-using Log4NetAppender.ExceptionStructure;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 
-namespace Log4NetAppender.Appender
+namespace HSG.Exception.Logging.Appender
 {
     public class RabbitMqAppender : AppenderSkeleton
     {
@@ -54,7 +54,7 @@ namespace Log4NetAppender.Appender
 
         protected override void Append(LoggingEvent loggingEvent)
         {
-            var currentException = (Exception)loggingEvent.MessageObject;
+            var currentException = (System.Exception)loggingEvent.MessageObject;
             var exceptionGuid = Guid.NewGuid();
 
             var exceptionWithInner = new List<TransformException>

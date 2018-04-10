@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
-using System.Data.Entity;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading;
+using HSG.Exception.Logging.Appender;
+using HSG.Exception.Logging.ExceptionDatabase;
+using HSG.Exception.Logging.ExceptionStructure;
 using log4net;
-using Log4NetAppender.Appender;
-using Log4NetAppender.ExceptionDatabase;
-using Log4NetAppender.ExceptionStructure;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace Log4NetAppender.Consumer
+namespace HSG.Exception.Logging.Consumer
 {
     public class ConsumerRepo
     {
@@ -94,7 +91,6 @@ namespace Log4NetAppender.Consumer
                     consumer.Received += (model, ea) =>
                     {
                         var message = Encoding.UTF8.GetString(ea.Body);
-                        Console.WriteLine("IDE IDE");
                         DeserializeAndConsume(message, context);
                         channel.BasicAck(ea.DeliveryTag, false);
                     };

@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace Log4NetAppender.Appender
+namespace HSG.Exception.Logging.Appender
 {
     public class WorkerThread<T> : IDisposable
     {

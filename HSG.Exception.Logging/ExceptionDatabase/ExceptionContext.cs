@@ -12,6 +12,9 @@ namespace HSG.Exception.Logging.ExceptionDatabase
 
         public virtual DbSet<QueueException> QueueExceptions { get; set; }
         public virtual DbSet<TransformException> TransformExceptions { get; set; }
+        public virtual DbSet<DirtyQueueException> DirtyQueueExceptions { get; set; }
+        public virtual DbSet<DirtyTransformException> DirtyTransformExceptions { get; set; }
+        public virtual DbSet<HistoricalQueueException> HistoricalQueueExceptions { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -19,6 +22,11 @@ namespace HSG.Exception.Logging.ExceptionDatabase
                 .HasKey(x => x.ExceptionId);
             modelBuilder.Entity<TransformException>()
                 .HasKey(x => new {x.ExceptionId, x.Order});
+            modelBuilder.Entity<DirtyQueueException>()
+                .HasKey(x => x.ExceptionId);
+            modelBuilder.Entity<DirtyTransformException>()
+                .HasKey(x => new {x.ExceptionId, x.Order});
+            // popravit za foreign key
             base.OnModelCreating(modelBuilder);
         }
     }

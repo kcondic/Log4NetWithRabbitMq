@@ -59,9 +59,9 @@ namespace HSG.Exception.Logging.Appender
             var currentException = (System.Exception)loggingEvent.MessageObject;
             var exceptionGuid = Guid.NewGuid();
 
-            var exceptionWithInner = new List<TransformException>
+            var exceptionWithInner = new List<DirtyTransformException>
             {
-                new TransformException(currentException, exceptionGuid, 0)
+                new DirtyTransformException(currentException, exceptionGuid, 0)
             };
 
             for (var i=0; i<DepthOfLog; ++i)
@@ -69,17 +69,17 @@ namespace HSG.Exception.Logging.Appender
                 if (currentException.InnerException == null)
                     break;
 
-                exceptionWithInner.Add(new TransformException(currentException.InnerException, exceptionGuid, i+1));
+                exceptionWithInner.Add(new DirtyTransformException(currentException.InnerException, exceptionGuid, i+1));
                 currentException = currentException.InnerException;
             }
 
             for (var i=0; i<exceptionWithInner.Count-1; i++)
-                exceptionWithInner[i].InnerException = exceptionWithInner[i+1];
+                exceptionWithInner[i].DirtyInnerException = exceptionWithInner[i+1];
 
-            var queueException = new QueueException(Tenent, Environment, AppName, loggingEvent.Level.DisplayName, exceptionWithInner[0]);
+            var dirtyQueueException = new DirtyQueueException(Tenent, Environment, AppName, loggingEvent.Level.DisplayName, exceptionWithInner[0]);
 
             var loggingEventData = (LoggingEventData)LoggingEventDataFieldInfo.GetValue(loggingEvent);
-            loggingEventData.Message = JsonConvert.SerializeObject(queueException);
+            loggingEventData.Message = JsonConvert.SerializeObject(dirtyQueueException);
             LoggingEventDataFieldInfo.SetValue(loggingEvent, loggingEventData);
 
             loggingEvent.Fix = FixFlags.All; // Otherwise, volatile data isn’t serialized.

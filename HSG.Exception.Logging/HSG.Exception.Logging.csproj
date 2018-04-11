@@ -64,6 +64,9 @@
     <Compile Include="Appender\WorkerThread.cs" />
     <Compile Include="Consumer\ConsumerRepo.cs" />
     <Compile Include="ExceptionDatabase\ExceptionContext.cs" />
+    <Compile Include="ExceptionStructure\DirtyQueueException.cs" />
+    <Compile Include="ExceptionStructure\DirtyTransformException.cs" />
+    <Compile Include="ExceptionStructure\HistoricalQueueException.cs" />
     <Compile Include="ExceptionStructure\QueueException.cs" />
     <Compile Include="ExceptionStructure\TransformException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

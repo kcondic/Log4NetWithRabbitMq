@@ -18,6 +18,7 @@ Testing solutions to log exception info via log4net to RabbitMQ
     <Environment value="prod.uction" />
     <AppName value="livebet" />
     <DepthOfLog value="2" />
+    <ExchangeName value="HattrickExchange" />
   </appender>
   <logger name="ExceptionLogger" additivity="false">
       <level value="ALL" />
@@ -38,6 +39,7 @@ Testing solutions to log exception info via log4net to RabbitMQ
    |Environment     |""              |Application environment.|   
    |AppName         |""              |Application name.|  
    |DepthOfLog      |0               |How deep will inner exceptions be logged. 0 means only top level <br> exception is logged.|
+   |ExchangeName    |HattrickExchange|Name of exchange to declare and connect to.
    
    Default values can be omitted from config.
    
@@ -63,31 +65,33 @@ Reuse config from publisher, or add key value pairs to appSettings:
   <add key="UserName" value="guest" />
   <add key="Password" value="testtest" />
   <add key="Port" value="5672" />
+  <add key="ExchangeName" value="HattrickExchange" />
 </appSettings>
 ```
 ## **Consumer usage**
+```C#
 var repo = new ConsumerRepo(); // declare consumer repository
-
-**Methods:**
 ```
+**Methods:**
+```C#
 DeclareQueue(string queueName, bool willDeleteAfterConnectionClose, IEnumerable<string> routingKeys)
 ```
 Specify name of queue to declare, whether it should be exclusive (delete on connection shutdown),
 and the bindings of the queue (specific routing keys to subscribe to).
-```    
+```C#    
 ConnectToQueue(string queueToConnectToName, int numberOfThreads=1)
 ```
 Connect to queue specified by name and start consuming. Specify number of threads to set up to
 achieve load balance (worker threads). Default number of threads is 1.
-```    
+```C#    
 DisconnectFromQueue(string consumerToDisconnectTag)
 ```
 Disconnects consumer with specified tag from its queue. Each consumer's tag is specified at creation time.
-```
+```C#
 DeleteQueue(string queueToDeleteName)
 ```
 Deletes the queue specified by the name.
-```    
+```C#    
 CloseConnection()
 ```
 Closes the whole connection. Therefore all consumers die too.

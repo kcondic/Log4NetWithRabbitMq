@@ -18,6 +18,7 @@ Testing solutions to log exception info via log4net to RabbitMQ
     <Environment value="prod.uction" />
     <AppName value="livebet" />
     <DepthOfLog value="2" />
+    <ExchangeName value="HattrickExchange" />
   </appender>
   <logger name="ExceptionLogger" additivity="false">
       <level value="ALL" />
@@ -38,6 +39,7 @@ Testing solutions to log exception info via log4net to RabbitMQ
    |Environment     |""              |Application environment.|   
    |AppName         |""              |Application name.|  
    |DepthOfLog      |0               |How deep will inner exceptions be logged. 0 means only top level <br> exception is logged.|
+   |ExchangeName    |HattrickExchange|Name of exchange to declare and connect to.
    
    Default values can be omitted from config.
    

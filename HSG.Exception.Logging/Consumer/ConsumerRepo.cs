@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Configuration;
 using System.Linq;
 using System.Text;
@@ -20,40 +21,40 @@ namespace HSG.Exception.Logging.Consumer
             _connectionFactory = GetFactory();
             _connection = GetConnection();
             _channel = _connection.CreateModel();
+            _rabbitAppenderConfig = LogManager.GetRepository()
+                                              .GetAppenders()
+                                              .SingleOrDefault(appender => appender.Name == "RabbitMqAppender") as RabbitMqAppender;
+            _manualConfig = ConfigurationManager.AppSettings;
         }
 
         private readonly IConnectionFactory _connectionFactory;
         private readonly IConnection _connection;
         private readonly IModel _channel;
+        private readonly RabbitMqAppender _rabbitAppenderConfig;
+        private readonly NameValueCollection _manualConfig;
 
-        private static IConnectionFactory GetFactory()
+        private IConnectionFactory GetFactory()
         {
-            var rabbitAppenderConfig = LogManager.GetRepository()
-                                                 .GetAppenders()
-                                                 .SingleOrDefault(appender => appender.Name == "RabbitMqAppender") as RabbitMqAppender;
-
-            if (rabbitAppenderConfig != null)
+            if (_rabbitAppenderConfig != null)
                 return new ConnectionFactory()
                 {
-                    HostName = rabbitAppenderConfig.HostName,
-                    VirtualHost = rabbitAppenderConfig.VirtualHost,
-                    UserName = rabbitAppenderConfig.UserName,
-                    Password = rabbitAppenderConfig.Password,
-                    RequestedHeartbeat = rabbitAppenderConfig.RequestedHeartbeat,
-                    Port = rabbitAppenderConfig.Port
+                    HostName = _rabbitAppenderConfig.HostName,
+                    VirtualHost = _rabbitAppenderConfig.VirtualHost,
+                    UserName = _rabbitAppenderConfig.UserName,
+                    Password = _rabbitAppenderConfig.Password,
+                    RequestedHeartbeat = _rabbitAppenderConfig.RequestedHeartbeat,
+                    Port = _rabbitAppenderConfig.Port
                 };
-
-            var manualConfig = ConfigurationManager.AppSettings;
 
             return new ConnectionFactory()
             {
-                HostName = manualConfig["HostName"] ?? "localhost",
-                VirtualHost = manualConfig["VirtualHost"] ?? "/",
-                UserName = manualConfig["UserName"] ?? "guest",
-                Password = manualConfig["Password"] ?? "guest",
-                RequestedHeartbeat = manualConfig["RequestedHeartBeat"] != null && 
-                                     int.TryParse(manualConfig["RequestedHeartBeat"], out var heartBeat) ? (ushort)heartBeat : (ushort)0,
-                Port = manualConfig["Port"] != null && int.TryParse(manualConfig["Port"], out var port) ? port : 5672
+                HostName = _manualConfig["HostName"] ?? "localhost",
+                VirtualHost = _manualConfig["VirtualHost"] ?? "/",
+                UserName = _manualConfig["UserName"] ?? "guest",
+                Password = _manualConfig["Password"] ?? "guest",
+                RequestedHeartbeat = _manualConfig["RequestedHeartBeat"] != null && 
+                                     int.TryParse(_manualConfig["RequestedHeartBeat"], out var heartBeat) ? (ushort)heartBeat : (ushort)0,
+                Port = _manualConfig["Port"] != null && int.TryParse(_manualConfig["Port"], out var port) ? port : 5672
             };
         }
 
@@ -64,7 +65,8 @@ namespace HSG.Exception.Logging.Consumer
 
         public void DeclareQueue(string queueName, bool willDeleteAfterConnectionClose, IEnumerable<string> routingKeys)
         {
-            _channel.ExchangeDeclare("HattrickExchange", "topic", true);
+            var exchangeName = _rabbitAppenderConfig != null ? _rabbitAppenderConfig.ExchangeName :  _manualConfig["ExchangeName"] ?? "HattrickExchange";
+            _channel.ExchangeDeclare(exchangeName, "topic", true);
             _channel.QueueDeclare(queueName, true, willDeleteAfterConnectionClose, false,
                 new Dictionary<string, object>
                 {
@@ -74,7 +76,7 @@ namespace HSG.Exception.Logging.Consumer
                 });
 
             foreach (var routingKey in routingKeys)
-                _channel.QueueBind(queueName, "HattrickExchange", routingKey);
+                _channel.QueueBind(queueName, exchangeName, routingKey);
         }
 
         public void ConnectToQueue(string queueToConnectToName, int numberOfThreads=1)
@@ -115,16 +117,11 @@ namespace HSG.Exception.Logging.Consumer
                     exception.Status == deserializedQueueException.Status &&
                     exception.Exception.StackTrace == deserializedQueueException.Exception.StackTrace);
 
-            if (alreadyExistingOccurrencesOfException.Any() && alreadyExistingOccurrencesOfException.All(exception => exception.IsAlreadyConsumed))
+            if (alreadyExistingOccurrencesOfException.Any())
                 return;
 
             if (alreadyExistingOccurrencesOfException.Count() > 3)
-            {
-                foreach (var exception in alreadyExistingOccurrencesOfException)
-                    exception.IsAlreadyConsumed = true;
-                contextOfThread.SaveChanges();
                 return;
-            }
 
             var topLevelException = deserializedQueueException.Exception;
             while (topLevelException.InnerException != null)

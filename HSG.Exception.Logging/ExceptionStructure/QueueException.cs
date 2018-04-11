@@ -19,7 +19,6 @@ namespace HSG.Exception.Logging.ExceptionStructure
             Status = logLevel;
             Exception = topLevelException;
             TimeOfException = DateTime.UtcNow;
-            IsAlreadyConsumed = false;
         }
 
         // setters needed for JSON deserialization
@@ -30,6 +29,5 @@ namespace HSG.Exception.Logging.ExceptionStructure
         public string Status { get; set; }
         public TransformException Exception { get; set; }
         public DateTime TimeOfException { get; set; }
-        public bool IsAlreadyConsumed { get; set; }
     }
 }

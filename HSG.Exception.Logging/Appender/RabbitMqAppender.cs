@@ -25,6 +25,7 @@ namespace HSG.Exception.Logging.Appender
             Environment = "";
             AppName = "";
             DepthOfLog = 0;
+            ExchangeName = "HattrickExchange";
         }
 
         private ConnectionFactory _connectionFactory;
@@ -44,6 +45,7 @@ namespace HSG.Exception.Logging.Appender
         public string Environment { get; set; }
         public string AppName { get; set; }
         public uint DepthOfLog { get; set; }
+        public string ExchangeName { get; set; }
 
 
         protected override void OnClose()
@@ -71,7 +73,7 @@ namespace HSG.Exception.Logging.Appender
                 currentException = currentException.InnerException;
             }
 
-            for (var i=0; i<exceptionWithInner.Count-1; ++i)
+            for (var i=0; i<exceptionWithInner.Count-1; i++)
                 exceptionWithInner[i].InnerException = exceptionWithInner[i+1];
 
             var queueException = new QueueException(Tenent, Environment, AppName, loggingEvent.Level.DisplayName, exceptionWithInner[0]);
@@ -80,7 +82,7 @@ namespace HSG.Exception.Logging.Appender
             loggingEventData.Message = JsonConvert.SerializeObject(queueException);
             LoggingEventDataFieldInfo.SetValue(loggingEvent, loggingEventData);
 
-            loggingEvent.Fix = FixFlags.All;
+            loggingEvent.Fix = FixFlags.All; // Otherwise, volatile data isn’t serialized.
             _worker.Enqueue(loggingEvent);
         }
 
@@ -96,7 +98,7 @@ namespace HSG.Exception.Logging.Appender
                 RequestedHeartbeat = RequestedHeartbeat,
                 Port = Port
             };
-            _worker = new WorkerThread<LoggingEvent>("Worker for log4net appender '" + Name + "'", TimeSpan.FromSeconds((double)FlushInterval), Process);
+            _worker = new WorkerThread<LoggingEvent>($"Worker for log4net appender '{Name}'", TimeSpan.FromSeconds((double)FlushInterval), Process);
         }
 
         public void Process(LoggingEvent[] logs)
@@ -104,12 +106,12 @@ namespace HSG.Exception.Logging.Appender
             using (var connection = _connectionFactory.CreateConnection())
                 using (var channel = connection.CreateModel())
                 {
-                    channel.ExchangeDeclare("HattrickExchange", "topic", true);
+                    channel.ExchangeDeclare(ExchangeName, "topic", true);
                     foreach (var log in logs)
                     {
-                        var completeRoutingKey = _routingKey + "." + log.Level.DisplayName;
+                        var completeRoutingKey = $"{_routingKey}.{log.Level.DisplayName}";
                         var body = Encoding.UTF8.GetBytes(log.RenderedMessage);
-                        channel.BasicPublish("HattrickExchange", completeRoutingKey, null, body);
+                        channel.BasicPublish(ExchangeName, completeRoutingKey, null, body);
                     }
                 }
         }

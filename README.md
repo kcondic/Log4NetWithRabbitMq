@@ -65,6 +65,7 @@ Reuse config from publisher, or add key value pairs to appSettings:
   <add key="UserName" value="guest" />
   <add key="Password" value="testtest" />
   <add key="Port" value="5672" />
+  <add key="ExchangeName" value="HattrickExchange" />
 </appSettings>
 ```
 ## **Consumer usage**

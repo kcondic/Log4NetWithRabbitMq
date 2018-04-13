@@ -26,7 +26,10 @@ namespace HSG.Exception.Logging.ExceptionDatabase
                 .HasKey(x => x.ExceptionId);
             modelBuilder.Entity<DirtyTransformException>()
                 .HasKey(x => new {x.ExceptionId, x.Order});
-            // popravit za foreign key
+            modelBuilder.Entity<HistoricalQueueException>()
+                .HasRequired(x => x.QueueException)
+                .WithMany(x => x.HistoricalExceptions)
+                .HasForeignKey(x => x.QueueExceptionId);
             base.OnModelCreating(modelBuilder);
         }
     }

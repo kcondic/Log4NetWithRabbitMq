@@ -18,42 +18,43 @@ namespace HSG.Exception.Logging.Consumer
     {
         public ConsumerRepo()
         {
+            _rabbitAppenderConfig = LogManager.GetRepository()
+                                              .GetAppenders()
+                                              .SingleOrDefault(appender => appender.Name == "RabbitMqAppender") as RabbitMqAppender;
+            _manualConfig = ConfigurationManager.AppSettings;
             _connectionFactory = GetFactory();
             _connection = GetConnection();
             _channel = _connection.CreateModel();
         }
 
+        private readonly RabbitMqAppender _rabbitAppenderConfig;
+        private readonly NameValueCollection _manualConfig;
         private readonly IConnectionFactory _connectionFactory;
         private readonly IConnection _connection;
         private readonly IModel _channel;
 
         private IConnectionFactory GetFactory()
-        {   // provjerit može li se na razini klase
-            var rabbitAppenderConfig = LogManager.GetRepository()
-                                                 .GetAppenders()
-                                                 .SingleOrDefault(appender => appender.Name == "RabbitMqAppender") as RabbitMqAppender;
-            if (rabbitAppenderConfig != null)
+        {
+            if (_rabbitAppenderConfig != null)
                 return new ConnectionFactory()
                 {
-                    HostName = rabbitAppenderConfig.HostName,
-                    VirtualHost = rabbitAppenderConfig.VirtualHost,
-                    UserName = rabbitAppenderConfig.UserName,
-                    Password = rabbitAppenderConfig.Password,
-                    RequestedHeartbeat = rabbitAppenderConfig.RequestedHeartbeat,
-                    Port = rabbitAppenderConfig.Port
+                    HostName = _rabbitAppenderConfig.HostName,
+                    VirtualHost = _rabbitAppenderConfig.VirtualHost,
+                    UserName = _rabbitAppenderConfig.UserName,
+                    Password = _rabbitAppenderConfig.Password,
+                    RequestedHeartbeat = _rabbitAppenderConfig.RequestedHeartbeat,
+                    Port = _rabbitAppenderConfig.Port
                 };
-
-            var manualConfig = ConfigurationManager.AppSettings;
 
             return new ConnectionFactory()
             {
-                HostName = manualConfig["HostName"] ?? "localhost",
-                VirtualHost = manualConfig["VirtualHost"] ?? "/",
-                UserName = manualConfig["UserName"] ?? "guest",
-                Password = manualConfig["Password"] ?? "guest",
-                RequestedHeartbeat = manualConfig["RequestedHeartBeat"] != null && 
-                                     int.TryParse(manualConfig["RequestedHeartBeat"], out var heartBeat) ? (ushort)heartBeat : (ushort)0,
-                Port = manualConfig["Port"] != null && int.TryParse(manualConfig["Port"], out var port) ? port : 5672
+                HostName = _manualConfig["HostName"] ?? "localhost",
+                VirtualHost = _manualConfig["VirtualHost"] ?? "/",
+                UserName = _manualConfig["UserName"] ?? "guest",
+                Password = _manualConfig["Password"] ?? "guest",
+                RequestedHeartbeat = _manualConfig["RequestedHeartBeat"] != null && 
+                                     int.TryParse(_manualConfig["RequestedHeartBeat"], out var heartBeat) ? (ushort)heartBeat : (ushort)0,
+                Port = _manualConfig["Port"] != null && int.TryParse(_manualConfig["Port"], out var port) ? port : 5672
             };
         }
 

@@ -47,9 +47,6 @@ BEGIN
 	join TransformExceptions as transform on queue.ExceptionId = transform.ExceptionId
 	WHERE dirty.StackTrace = transform.StackTrace
 
-
-	SELECT * FROM #tmp
-	SELECT * FROM #queueExceptionsToUpdate
 	-- Delete exceptions from first table that have same ID's in both temporary tables, so that the first one contains data to insert to clean table, and the second contains data to update in the clean table.
 	DELETE FROM #tmp WHERE ExceptionId IN (SELECT TempId FROM #queueExceptionsToUpdate)
 

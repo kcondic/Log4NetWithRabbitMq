@@ -43,6 +43,13 @@ Testing solutions to log exception info via log4net to RabbitMQ
    
    Default values can be omitted from config.
    
+   **WARNING!** Periods can be used in Tenent/Environment/AppName but they will be replaced
+   with %2E to prevent RabbitMQ from thinking they're a routing key separator.
+   So if there are periods in those values, be sure to subscribe to the appropriate
+   queues using %2E in the words, leaving periods only as a separator.
+   
+   *e.g. ca.sa.production.betshop.DEBUG should be: ca%2Esa.production.betshop.DEBUG*
+   
 ## **Publisher usage**
 ```C#
 log4net.Config.BasicConfigurator.Configure();

@@ -21,7 +21,7 @@ namespace Log4NetAppender
             });
             repo.ConnectToQueue("test", 8);
 
-            for (var i = 0; i < 100; ++i)
+            for (var i = 0; i < 10; ++i)
             {
                 try
                 {
@@ -29,7 +29,7 @@ namespace Log4NetAppender
                 }
                 catch (Exception e)
                 {
-                    logger.Debug(e);
+                    logger.Error(e);
                 }
             }
             Console.ReadLine();

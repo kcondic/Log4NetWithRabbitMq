@@ -1,5 +1,7 @@
 # Log4NetWithRabbitMq
-Testing solutions to log exception info via log4net to RabbitMQ
+Project for extracting a nuget package that enables the utilization
+of Log4Net for logging exceptions and RabbitMQ for queueing and
+consuming messages from queues.
 
 ## **Publisher config**
 ```xml
